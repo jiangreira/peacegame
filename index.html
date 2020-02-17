@@ -1,0 +1,176 @@
+<!-- @format -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>促進和平Peace Game</title>
+    <link rel="stylesheet" href="plugins/bootstrap.min.css" />
+    <link href="https://fonts.googleapis.com/css?family=Noto+Sans+TC|Odibee+Sans&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="plugins/style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <!-- 遊戲說明 -->
+      <div class="container">
+        <div class="card mx-auto desc">
+          <div class="card-header">
+            促進和平 Peace Game
+          </div>
+          <div class="card-body pb-0">
+            <p>遊戲說明</p>
+            <div class="row text-center">
+              <div class="col-4">
+                <img src="game2.png" class="descimg" />
+                <p>初始狀態</p>
+              </div>
+              <div class="col-4">
+                <img src="game1.png" class="descimg" />
+                <p>點擊+1分</p>
+              </div>
+              <div class="col-4">
+                <img src="game3.png" class="descimg" />
+                <p>回復狀態</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <hr>
+      <!-- 計分區 -->
+      <div class="control">
+        <div class="msg">
+          <button class="btn btn-info" id="start">START</button>
+          <span class="pl-3 pr-2">剩餘時間:</span><span id="time">60s</span> <span class="pl-3 pr-2">成績分數:</span><span id="combo">0</span>
+        </div>
+      </div>
+      <!-- 遊戲區 -->
+      <div class="container">
+        <div class="row mx-auto content">
+          <div class="col p-0 ">
+            <img src="game2.png" class="cell" title="ready" onclick="gotpoint(0)" />
+            <img src="game2.png" class="cell" title="ready" onclick="gotpoint(1)" />
+            <img src="game2.png" class="cell" title="ready" onclick="gotpoint(2)" />
+          </div>
+
+          <div class="col p-0">
+            <img src="game2.png" class="cell" title="ready" onclick="gotpoint(3)" />
+            <img src="game2.png" class="cell" title="ready" onclick="gotpoint(4)" />
+            <img src="game2.png" class="cell" title="ready" onclick="gotpoint(5)" />
+          </div>
+
+          <div class="col p-0">
+            <img src="game2.png" class="cell" title="ready" onclick="gotpoint(6)" />
+            <img src="game2.png" class="cell" title="ready" onclick="gotpoint(7)" />
+            <img src="game2.png" class="cell" title="ready" onclick="gotpoint(8)" />
+          </div>
+        </div>
+      </div>
+      <hr>
+      <footer class="text-center mt-5 mb-5 ">
+        ReiraJiang © 2020
+      </footer>
+    </div>
+    
+
+    <!-- bootstrap -->
+    <script src="plugins/jquery-3.4.1.min.js"></script>
+    <script src="plugins/popper.min.js"></script>
+    <script src="plugins/bootstrap.min.js"></script>
+
+    <script>
+      // 初始化
+      var btn = document.getElementById("start");
+      var time = document.getElementById("time");
+      var combo = document.getElementById("combo");
+      var target = document.getElementsByClassName("cell");
+      var flag = 0; //判別遊戲狀況  停止0 遊戲中1
+      var sec = 0,
+        score = 0;
+      var change_ready = new Array(); //存放hit事件的轉ready定時器(陣列有九個位置);
+
+      btn.addEventListener("click", gamestart);
+
+      function gamestart() {
+        (sec = 60), (count = 0), (flag = 1);
+        time.textContent = `${sec}s`;
+        combo.textContent = `${score}`;
+
+        btn.removeEventListener("click", gamestart); //關閉btn 不再次觸發
+
+        let start = setInterval(() => {
+          //控制倒數及遊戲區間的隔離
+          if (sec == 0) {
+            //寫sec==0 當sec為0,則為false
+            clearInterval(start);
+            flag = 0;
+            btn.addEventListener("click", gamestart);
+          } else {
+            sec--;
+            time.textContent = `${sec}s`;
+          }
+        }, 1000);
+
+        for (let i = 0; i < 100; i++) {
+          //產生100個事件
+          let ontime = Math.floor(Math.random() * 57000); //隨機1000-57000秒
+          let which = Math.floor(Math.random() * 9); //隨機0-8處
+          let delay = Math.floor(Math.random() * 3 + 2); //隨機2-4秒
+
+          setTimeout(function() {
+            showit(which, delay, i);
+          }, ontime);
+        }
+      }
+
+      function showit(which, delay, i) {
+        if (target[which].title != "ready") {
+          //不是在等待狀態,就不要換圖片
+          // let nextwhich = (which == 8) ? 0 : which + 1; //寫法1
+          // let nextwhich = (which + 1) % 9; //寫法2  得到0
+          let nextwhich = Math.floor(Math.random() * 9);
+          setTimeout(function() {
+            showit(nextwhich, delay, i);
+          }, 100);
+        } else {
+          target[which].src = "game1.png";
+          target[which].style.background = "lightyellow";
+          target[which].title = "hit";
+          target[which].alt = i;
+
+          change_ready[i] = setTimeout(() => {
+            //pink多久之後變回ready事件
+            target[which].src = "game2.png";
+            target[which].style.background = null;
+            target[which].title = "ready";
+          }, delay * 1000);
+        }
+      }
+
+      function gotpoint(where) {
+        //當為hit時才計分 且換圖片(hug)
+        if (target[where].title == "hit" && flag == 1) {
+          //確定遊戲中的hit事件
+          target[where].src = "game3.png";
+          target[where].style.background = "pink";
+          target[where].title = "hug";
+
+          count++;
+          combo.textContent = `${count}`;
+
+          id = target[where].alt;
+          clearTimeout(change_ready[id]); //清除hit的炸彈
+          target[where].alt = null;
+
+          setTimeout(() => {
+            //pink多久之後變回ready事件
+            target[where].src = "game2.png";
+            target[where].style.background = null;
+            target[where].title = "ready";
+          }, 1000);
+        }
+      }
+    </script>
+  </body>
+</html>
