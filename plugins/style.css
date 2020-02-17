@@ -2,6 +2,7 @@
 
 body {
   font-family: "Odibee Sans", "Noto Sans TC", sans-serif;
+  background-color: #758D60;
 }
 .divider {
   height: 0;
@@ -46,6 +47,9 @@ body {
 }
 #time,#combo{
     font-size: 1.5rem;
+}
+footer{
+  font-size: 1.5rem;
 }
 
 
